@@ -1,35 +1,33 @@
-# Đồ Án Cuối Kỳ: Lập Trình Ứng Dụng Di Động
+# Bài cuối kỳ bộ môn: Lập Trình Ứng Dụng Di Động
 
-## 📌 Thông tin đề tài
-- **Tên ứng dụng:** Quản lý Tài chính Cá nhân (Money Manager)
-- **Tên Repository:** MoneyApp_CUOIKI_LTUDDD
-- **Công cụ phát triển:** Android Studio (Java), SQLite
+## 🚀 Thông tin chung
+- **Tên đề tài:** Ứng dụng Quản lý Tài chính Cá nhân (Money Manager)
+- **Ngôn ngữ:** Java
+- **Công cụ:** Android Studio, SQLite
+- **Nhóm sinh viên thực hiện:**
+    1. **Nghiêm Đức Anh** - MSSV: A48415
+    2. **Nguyễn Tiến Dũng** - MSSV: AA47114
 
-## 👥 Sinh viên thực hiện
-1. **Nghiêm Đức Anh** - MSSV: A48415
-2. **Nguyễn Tiến Dũng** - MSSV: AA47114
+## 🌟 Giới thiệu bài làm
+Đây là ứng dụng giúp người dùng theo dõi thu nhập và chi tiêu hằng ngày một cách đơn giản và hiệu quả. Ứng dụng hỗ trợ quản lý đa người dùng và lưu trữ dữ liệu an toàn ngay trên thiết bị bằng SQLite.
+Ứng dụng được làm với mục đích sử dụng cả nhân nên làm rất cơ bản chỉ có những chức năng cơ bản và đơn giản.
 
-## 📖 Giới thiệu bài làm
-Ứng dụng được thiết kế để hỗ trợ cá nhân quản lý các khoản thu và chi hằng ngày. Dữ liệu được lưu trữ trực tiếp trên thiết bị (SQLite), đảm bảo tính riêng tư cho từng tài khoản người dùng khác nhau.
+## 🛠 Các chức năng chính đã hoàn thành
+- **Quản lý tài khoản:** Đăng ký, Đăng nhập cá nhân.
+- **Quản lý mật khẩu:** Khôi phục mật khẩu bằng tên đăng nhập và đổi mật khẩu trong phần Profile.
+- **Quản lý thu chi:** Thêm mới giao dịch linh hoạt (Khoản thu/Khoản chi).
+- **Thống kê báo cáo:** - Xem tổng thu, tổng chi và số dư hiện tại ngay trên màn hình chính.
+    - Tự động đổi màu số dư (Màu Đỏ khi âm tiền, Màu Xanh khi dư tiền).
+- **Bộ lọc dữ liệu (Filter):**
+    - Lọc theo loại: Tất cả / Chỉ Thu / Chỉ Chi.
+    - Lọc theo thời gian: Hôm nay / Tháng này.
+- **Cảnh báo thông minh:** Tự động hiện thông báo (Alert) nhắc nhở khi chi tiêu vượt quá mức thu nhập.
+- **Giao diện tối ưu:** Tự động ẩn/hiện các thành phần thống kê dựa trên bộ lọc của người dùng.
 
-## ✨ Các tính năng chính
-- **Hệ thống người dùng:** Đăng ký tài khoản và Đăng nhập bảo mật.
-- **Quản lý mật khẩu:** Chức năng lấy lại mật khẩu nhanh và đổi mật khẩu trong trang cá nhân.
-- **Quản lý giao dịch:** - Thêm khoản Thu hoặc Chi với đầy đủ số tiền, ngày tháng và nội dung.
-    - Danh sách lịch sử giao dịch trực quan.
-- **Báo cáo thu chi (Thống kê):**
-    - Tự động tính tổng tiền Thu và tổng tiền Chi.
-    - Tính toán Số dư hiện tại (Tự động đổi màu chữ sang đỏ nếu chi vượt thu).
-- **Bộ lọc thông minh (Filter):**
-    - Lọc dữ liệu theo thời gian: Xem theo ngày hôm nay hoặc trong tháng hiện tại.
-    - Lọc dữ liệu theo loại: Xem riêng các khoản Thu hoặc các khoản Chi.
-- **Cảnh báo thông minh:** Hiển thị thông báo nhắc nhở nếu tài khoản đang ở trạng thái âm tiền.
-
-## 🛠 Hướng dẫn sử dụng
-1. Mở dự án bằng **Android Studio**.
-2. Build và chạy ứng dụng trên máy ảo hoặc thiết bị Android.
-3. Đăng ký tài khoản mới để bắt đầu quản lý tài chính.
+## 📦 Cách cài đặt
+1. Clone dự án từ GitHub này về máy.
+2. Mở bằng **Android Studio**.
+3. Chạy trên máy ảo Android (Emulator) hoặc xuất file APK để cài lên điện thoại Android.
 
 ---
-*Đây là sản phẩm hoàn thiện cho môn học Lập Trình Ứng Dụng Di Động.*
-*Cảm ơn Thầy Cường - GV bộ môn đã hướng dẫn bọn em trong môn học này!*
+*Cảm ơn Thầy/Cô đã dành thời gian xem qua bài tập cuối kỳ của nhóm chúng em!*
