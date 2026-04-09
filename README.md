@@ -4,13 +4,14 @@
 - **Tên đề tài:** Ứng dụng Quản lý Tài chính Cá nhân (Money Manager)
 - **Ngôn ngữ:** Java
 - **Công cụ:** Android Studio, SQLite
-- **Nhóm sinh viên thực hiện:**
-    1. **Nghiêm Đức Anh** - MSSV: A48415
-    2. **Nguyễn Tiến Dũng** - MSSV: AA47114
+
+## 👥 Sinh viên thực hiện
+1. **Nghiêm Đức Anh** - MSSV: A48415
+2. **Nguyễn Tiến Dũng** - MSSV: AA47114
 
 ## 🌟 Giới thiệu bài làm
-Đây là ứng dụng giúp người dùng theo dõi thu nhập và chi tiêu hằng ngày một cách đơn giản và hiệu quả. Ứng dụng hỗ trợ quản lý đa người dùng và lưu trữ dữ liệu an toàn ngay trên thiết bị bằng SQLite.
-Ứng dụng được làm với mục đích sử dụng cả nhân nên làm rất cơ bản chỉ có những chức năng cơ bản và đơn giản.
+- Đây là ứng dụng giúp người dùng theo dõi thu nhập và chi tiêu hằng ngày một cách đơn giản và hiệu quả. Ứng dụng hỗ trợ quản lý đa người dùng và lưu trữ dữ liệu an toàn ngay trên thiết bị bằng SQLite.
+- Ứng dụng được làm với mục đích sử dụng cả nhân nên làm rất cơ bản chỉ có những chức năng cơ bản và đơn giản.
 
 ## 🛠 Các chức năng chính đã hoàn thành
 - **Quản lý tài khoản:** Đăng ký, Đăng nhập cá nhân.
@@ -30,4 +31,5 @@
 3. Chạy trên máy ảo Android (Emulator) hoặc xuất file APK để cài lên điện thoại Android.
 
 ---
-*Cảm ơn Thầy/Cô đã dành thời gian xem qua bài tập cuối kỳ của nhóm chúng em!*
+*Bài làm còn rất nhiều hạn chế và chỉ có những chức năng cơ bản vì trình độ của bọn em còn thấp, bọn em sẽ cố cải thiện!*
+*Cảm ơn thầy Nguyễn Hùng Cường đã hướng dẫn bọn học về bộ môn này!*
