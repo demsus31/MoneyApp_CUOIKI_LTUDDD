@@ -32,4 +32,4 @@
 
 ---
 *Bài làm còn rất nhiều hạn chế và chỉ có những chức năng cơ bản vì trình độ của bọn em còn thấp, bọn em sẽ cố cải thiện!*
-*Cảm ơn thầy Nguyễn Hùng Cường đã hướng dẫn bọn em về bộ môn này!*
+*Cảm ơn thầy Nguyễn Hùng Cường đã hướng dẫn bọn em trong quá trình học hỏi bộ môn này!*
