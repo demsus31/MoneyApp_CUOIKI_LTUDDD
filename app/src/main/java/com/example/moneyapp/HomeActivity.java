@@ -1,43 +1,50 @@
 package com.example.moneyapp;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
 
-    // Khai báo công cụ giao diện
-    Button btnThemGiaoDich, btnLocTatCa, btnLocThu, btnLocChi, btnHomNay, btnThangNay, btnProfile;
+    Button btnThemGiaoDich, btnLocTatCa, btnLocThu, btnLocChi, btnTimKiemNgay, btnTimKiemKhoangNgay, btnProfile, btnBaoCao;
     TextView tvTongThu, tvTongChi, tvSoDu;
     DatabaseHelper dbHelper;
-
-    // Khai báo công cụ để làm Danh sách (ListView)
     ListView lvLichSu;
     ArrayList<String> danhSachGiaoDich;
     ArrayAdapter<String> adapter;
 
-    // Biến lưu trạng thái người dùng đang chọn Nút Lọc nào
     int cheDoLocLoai = 0;     // 0: Tất cả, 1: Thu, 2: Chi
-    int cheDoLocThoiGian = 0; // 0: Mọi lúc, 1: Hôm nay, 2: Tháng này
+    int cheDoLocThoiGian = 0; // 0: Mọi lúc, 1: Ngày cụ thể, 2: Khoảng ngày
 
-    // Cờ (Flag) chặn spam: Đảm bảo cảnh báo vượt chi chỉ hiện 1 lần duy nhất khi mở app
+    String ngayTimKiem = "";  // Dùng cho chế độ 1 (Tìm 1 ngày)
+    Date ngayBatDau = null;   // Dùng cho chế độ 2 (Từ ngày)
+    Date ngayKetThuc = null;  // Dùng cho chế độ 2 (Đến ngày)
+
     boolean daCanhBao = false;
 
     @Override
@@ -45,88 +52,229 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Ánh xạ
+        // Ánh xạ giao diện
         btnThemGiaoDich = findViewById(R.id.btnThemGiaoDich);
         btnLocTatCa = findViewById(R.id.btnLocTatCa);
         btnLocThu = findViewById(R.id.btnLocThu);
         btnLocChi = findViewById(R.id.btnLocChi);
-        btnHomNay = findViewById(R.id.btnHomNay);
-        btnThangNay = findViewById(R.id.btnThangNay);
-        btnProfile = findViewById(R.id.btnProfile); // Nút chuyển sang trang Tài khoản
+        btnTimKiemNgay = findViewById(R.id.btnTimKiemNgay);
+        btnTimKiemKhoangNgay = findViewById(R.id.btnTimKiemKhoangNgay);
+        btnProfile = findViewById(R.id.btnProfile);
+        btnBaoCao = findViewById(R.id.btnBaoCao); // Nút Báo cáo mới thêm
 
         tvTongThu = findViewById(R.id.tvTongThu);
         tvTongChi = findViewById(R.id.tvTongChi);
         tvSoDu = findViewById(R.id.tvSoDu);
         lvLichSu = findViewById(R.id.lvLichSu);
 
-        // Cài đặt cầu nối (Adapter) cho Danh sách
         dbHelper = new DatabaseHelper(this);
         danhSachGiaoDich = new ArrayList<>();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, danhSachGiaoDich);
         lvLichSu.setAdapter(adapter);
 
-        // --- CÀI ĐẶT SỰ KIỆN CHO CÁC NÚT BẤM ---
-
-        // Chuyển sang trang Profile
+        // --- CÁC SỰ KIỆN CHUYỂN TRANG ---
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
             startActivity(intent);
         });
 
-        // NÚT TẤT CẢ LÀM MASTER RESET: Nhấn vào là reset sạch sành sanh các bộ lọc
-        btnLocTatCa.setOnClickListener(v -> { cheDoLocLoai = 0; cheDoLocThoiGian = 0; capNhatThongKe(); });
+        btnBaoCao.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, ReportActivity.class);
+            startActivity(intent);
+        });
 
-        // Hàng 1: Lọc Loại (Thu/Chi)
-        btnLocThu.setOnClickListener(v -> { cheDoLocLoai = 1; capNhatThongKe(); });
-        btnLocChi.setOnClickListener(v -> { cheDoLocLoai = 2; capNhatThongKe(); });
-
-        // Hàng 2: Lọc Thời Gian. (Tự động reset Lọc Loại về Tất Cả để tránh kẹt logic)
-        btnHomNay.setOnClickListener(v -> { cheDoLocThoiGian = 1; cheDoLocLoai = 0; capNhatThongKe(); });
-        btnThangNay.setOnClickListener(v -> { cheDoLocThoiGian = 2; cheDoLocLoai = 0; capNhatThongKe(); });
-
-        // Nút Thêm Giao Dịch
         btnThemGiaoDich.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, AddTransactionActivity.class);
             startActivity(intent);
         });
+
+        // --- CÁC SỰ KIỆN NÚT BẤM BỘ LỌC ---
+        btnLocTatCa.setOnClickListener(v -> { cheDoLocLoai = 0; cheDoLocThoiGian = 0; capNhatThongKe(); });
+        btnLocThu.setOnClickListener(v -> { cheDoLocLoai = 1; capNhatThongKe(); });
+        btnLocChi.setOnClickListener(v -> { cheDoLocLoai = 2; capNhatThongKe(); });
+
+        btnTimKiemNgay.setOnClickListener(v -> hienBangTimKiemNgay());
+        btnTimKiemKhoangNgay.setOnClickListener(v -> hienBangTimKiemKhoangNgay());
     }
 
-    // Hàm onResume LUÔN LUÔN CHẠY mỗi khi người dùng quay lại màn hình này
     @Override
     protected void onResume() {
         super.onResume();
-        daCanhBao = false; // Reset lại trạng thái cảnh báo
-        capNhatThongKe();  // Vẽ lại toàn bộ dữ liệu
+        daCanhBao = false; // Reset cảnh báo mỗi khi quay lại trang chủ
+        capNhatThongKe();
     }
 
-    // --- BỘ NÃO TÍNH TOÁN VÀ ĐIỀU HƯỚNG GIAO DIỆN CHÍNH ---
+    // --- CÔNG CỤ: TỰ ĐỘNG THÊM DẤU GẠCH CHÉO ---
+    private void ganHieuUngGachCheo(EditText edt) {
+        edt.addTextChangedListener(new TextWatcher() {
+            boolean isUpdating = false;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (isUpdating) return;
+                isUpdating = true;
+                String str = s.toString().replace("/", "");
+                StringBuilder formatted = new StringBuilder();
+                for (int i = 0; i < str.length(); i++) {
+                    if (i == 2 || i == 4) formatted.append("/");
+                    formatted.append(str.charAt(i));
+                }
+                if (formatted.length() > 10) formatted.delete(10, formatted.length());
+                edt.setText(formatted.toString());
+                edt.setSelection(formatted.length());
+                isUpdating = false;
+            }
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    // --- CHẾ ĐỘ 1: BẢNG TÌM 1 NGÀY ---
+    private void hienBangTimKiemNgay() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("🔍 Tìm 1 ngày cụ thể");
+
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setPadding(50, 30, 50, 10);
+
+        EditText edtInputDate = new EditText(this);
+        edtInputDate.setHint("Nhập ngày (dd/mm/yyyy)");
+        edtInputDate.setInputType(InputType.TYPE_CLASS_DATETIME);
+        edtInputDate.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        ganHieuUngGachCheo(edtInputDate);
+
+        Button btnCalendar = new Button(this);
+        btnCalendar.setText("📅");
+        btnCalendar.setTextSize(20);
+        btnCalendar.setBackgroundColor(Color.TRANSPARENT);
+
+        btnCalendar.setOnClickListener(view -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (dView, y, m, d) -> {
+                edtInputDate.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", d, m + 1, y));
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        });
+
+        layout.addView(edtInputDate);
+        layout.addView(btnCalendar);
+        builder.setView(layout);
+
+        builder.setPositiveButton("TÌM", (dialog, which) -> {
+            String nhapVao = edtInputDate.getText().toString();
+            if (nhapVao.length() == 10) {
+                ngayTimKiem = nhapVao;
+                cheDoLocThoiGian = 1;
+                capNhatThongKe();
+            } else {
+                Toast.makeText(this, "Nhập đủ định dạng dd/mm/yyyy", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("HỦY", null);
+        builder.show();
+    }
+
+    // --- CHẾ ĐỘ 2: BẢNG TÌM KHOẢNG NGÀY ---
+    private void hienBangTimKiemKhoangNgay() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("🗓 Tìm kiếm khoảng ngày");
+
+        LinearLayout layoutTong = new LinearLayout(this);
+        layoutTong.setOrientation(LinearLayout.VERTICAL);
+        layoutTong.setPadding(50, 30, 50, 10);
+
+        // Hàng 1: Từ ngày
+        LinearLayout layoutTu = new LinearLayout(this);
+        layoutTu.setOrientation(LinearLayout.HORIZONTAL);
+        EditText edtTuNgay = new EditText(this);
+        edtTuNgay.setHint("Từ ngày (dd/mm/yyyy)");
+        edtTuNgay.setInputType(InputType.TYPE_CLASS_DATETIME);
+        edtTuNgay.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        ganHieuUngGachCheo(edtTuNgay);
+
+        Button btnCalTu = new Button(this);
+        btnCalTu.setText("📅");
+        btnCalTu.setBackgroundColor(Color.TRANSPARENT);
+        btnCalTu.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (dView, y, m, d) -> {
+                edtTuNgay.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", d, m + 1, y));
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        });
+        layoutTu.addView(edtTuNgay);
+        layoutTu.addView(btnCalTu);
+
+        // Hàng 2: Đến ngày
+        LinearLayout layoutDen = new LinearLayout(this);
+        layoutDen.setOrientation(LinearLayout.HORIZONTAL);
+        EditText edtDenNgay = new EditText(this);
+        edtDenNgay.setHint("Đến ngày (dd/mm/yyyy)");
+        edtDenNgay.setInputType(InputType.TYPE_CLASS_DATETIME);
+        edtDenNgay.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        ganHieuUngGachCheo(edtDenNgay);
+
+        Button btnCalDen = new Button(this);
+        btnCalDen.setText("📅");
+        btnCalDen.setBackgroundColor(Color.TRANSPARENT);
+        btnCalDen.setOnClickListener(v -> {
+            Calendar c = Calendar.getInstance();
+            new DatePickerDialog(this, (dView, y, m, d) -> {
+                edtDenNgay.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", d, m + 1, y));
+            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
+        });
+        layoutDen.addView(edtDenNgay);
+        layoutDen.addView(btnCalDen);
+
+        layoutTong.addView(layoutTu);
+        layoutTong.addView(layoutDen);
+        builder.setView(layoutTong);
+
+        builder.setPositiveButton("TÌM KIẾM", (dialog, which) -> {
+            String strTu = edtTuNgay.getText().toString();
+            String strDen = edtDenNgay.getText().toString();
+
+            if (strTu.length() == 10 && strDen.length() == 10) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    ngayBatDau = sdf.parse(strTu);
+                    ngayKetThuc = sdf.parse(strDen);
+
+                    if (ngayKetThuc.before(ngayBatDau)) {
+                        Toast.makeText(this, "Ngày KẾT THÚC phải sau ngày BẮT ĐẦU!", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    cheDoLocThoiGian = 2; // Bật chế độ lọc khoảng ngày
+                    capNhatThongKe();
+
+                } catch (Exception e) {
+                    Toast.makeText(this, "Ngày không hợp lệ", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "Vui lòng nhập đủ định dạng 2 ô", Toast.LENGTH_SHORT).show();
+            }
+        });
+        builder.setNegativeButton("HỦY", null);
+        builder.show();
+    }
+
+    // --- XỬ LÝ LÕI: QUÉT DỮ LIỆU & CẬP NHẬT GIAO DIỆN ---
     @SuppressLint("Range")
     private void capNhatThongKe() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        // 1. Lấy chuỗi Ngày/Tháng hiện tại của điện thoại
-        String ngayHienTai = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-        String thangHienTai = new SimpleDateFormat("MM/yyyy", Locale.getDefault()).format(new Date());
-
-        // 2. Lấy tên tài khoản đang đăng nhập để lọc đúng dữ liệu
         SharedPreferences sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String currentUser = sharedPref.getString("current_user", "");
 
-        // 3. Xây dựng câu lệnh SQL
-        String query = "SELECT * FROM transactions WHERE username = '" + currentUser + "'";
-
-        // Lọc thời gian
-        if (cheDoLocThoiGian == 1) query += " AND date = '" + ngayHienTai + "'";
-        else if (cheDoLocThoiGian == 2) query += " AND date LIKE '%" + thangHienTai + "'";
-
-        query += " ORDER BY id DESC"; // Mới nhất lên đầu
+        // Lấy toàn bộ dữ liệu của User này ra, việc kiểm tra ngày để Java lo
+        String query = "SELECT * FROM transactions WHERE username = '" + currentUser + "' ORDER BY id DESC";
 
         Cursor cursor = db.rawQuery(query, null);
         double tongThu = 0, tongChi = 0;
         danhSachGiaoDich.clear();
-        DecimalFormat formatter = new DecimalFormat("#,###"); // Định dạng có dấu chấm
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
 
-        // 4. Quét qua dữ liệu trong Database
         if (cursor.moveToFirst()) {
             do {
                 int type = cursor.getInt(cursor.getColumnIndex("type"));
@@ -134,51 +282,62 @@ public class HomeActivity extends AppCompatActivity {
                 String date = cursor.getString(cursor.getColumnIndex("date"));
                 String note = cursor.getString(cursor.getColumnIndex("note"));
 
-                // BƯỚC TÍNH TIỀN: Luôn luôn cộng tổng tiền
-                if (type == 1) tongThu += amount;
-                else tongChi += amount;
+                boolean thoaManThoiGian = true;
 
-                // BƯỚC VẼ DANH SÁCH: Khớp bộ lọc Loại mới cho vào danh sách
-                if (cheDoLocLoai == 0 || cheDoLocLoai == type) {
-                    String formattedAmount = formatter.format(amount).replace(",", ".");
-                    danhSachGiaoDich.add(((type == 1) ? "[THU] " : "[CHI] ") + note + ": " + formattedAmount + " đ (" + date + ")");
+                // Kiểm tra xem hóa đơn này có khớp với bộ lọc ngày không
+                if (cheDoLocThoiGian == 1) { // Chọn 1 ngày
+                    if (!date.equals(ngayTimKiem)) thoaManThoiGian = false;
+                } else if (cheDoLocThoiGian == 2) { // Chọn khoảng ngày
+                    try {
+                        Date d = sdf.parse(date);
+                        if (d.before(ngayBatDau) || d.after(ngayKetThuc)) thoaManThoiGian = false;
+                    } catch (Exception e) { thoaManThoiGian = false; }
+                }
+
+                if (thoaManThoiGian) {
+                    if (type == 1) tongThu += amount;
+                    else tongChi += amount;
+
+                    if (cheDoLocLoai == 0 || cheDoLocLoai == type) {
+                        String formattedAmount = formatter.format(amount).replace(",", ".");
+                        danhSachGiaoDich.add(((type == 1) ? "[THU] " : "[CHI] ") + note + ": " + formattedAmount + " đ (" + date + ")");
+                    }
                 }
             } while (cursor.moveToNext());
         }
         cursor.close();
 
-        // 5. Tính số dư và cập nhật màn hình
         double soDu = tongThu - tongChi;
 
-        // Nhãn thời gian linh hoạt
-        String labelThoiGian = (cheDoLocThoiGian == 0) ? "MỌI LÚC" : (cheDoLocThoiGian == 1) ? "HÔM NAY" : "THÁNG NÀY";
+        // Cập nhật Nhãn thời gian
+        String labelThoiGian = "MỌI LÚC";
+        if (cheDoLocThoiGian == 1) {
+            labelThoiGian = ngayTimKiem;
+        } else if (cheDoLocThoiGian == 2 && ngayBatDau != null && ngayKetThuc != null) {
+            labelThoiGian = new SimpleDateFormat("dd/MM", Locale.getDefault()).format(ngayBatDau) + " -> " +
+                    new SimpleDateFormat("dd/MM", Locale.getDefault()).format(ngayKetThuc);
+        }
 
         tvTongThu.setText("Tổng thu:\n" + formatter.format(tongThu).replace(",", ".") + " đ");
         tvTongChi.setText("Tổng chi:\n" + formatter.format(tongChi).replace(",", ".") + " đ");
         tvSoDu.setText("SỐ DƯ (" + labelThoiGian + "): " + formatter.format(soDu).replace(",", ".") + " đ");
 
-        // --- 6. ẢO THUẬT UX/UI: ẨN HIỆN THÀNH PHẦN GIAO DIỆN ---
+        // Ẩn hiện các mục dựa vào việc người dùng đang lọc Thu hay lọc Chi
         if (cheDoLocLoai == 1) {
-            // Bấm CHỈ THU -> Ẩn Tổng Chi
             tvTongThu.setVisibility(View.VISIBLE);
             tvTongChi.setVisibility(View.GONE);
         } else if (cheDoLocLoai == 2) {
-            // Bấm CHỈ CHI -> Ẩn Tổng Thu
             tvTongThu.setVisibility(View.GONE);
             tvTongChi.setVisibility(View.VISIBLE);
         } else {
-            // Bấm TẤT CẢ -> Hiện hết
             tvTongThu.setVisibility(View.VISIBLE);
             tvTongChi.setVisibility(View.VISIBLE);
-
-            // CHỈ CẢNH BÁO KHI ĐANG XEM "TẤT CẢ" VÀ CHỈ 1 LẦN
             if (soDu < 0 && !daCanhBao) {
                 hienCanhBaoVuotChi();
                 daCanhBao = true;
             }
         }
 
-        // LUÔN BÁM TRỤ SỐ DƯ VÀ ĐỔI MÀU NẾU ÂM TIỀN
         tvSoDu.setVisibility(View.VISIBLE);
         if (soDu < 0) {
             tvSoDu.setTextColor(Color.RED);
@@ -186,11 +345,9 @@ public class HomeActivity extends AppCompatActivity {
             tvSoDu.setTextColor(Color.parseColor("#1565C0"));
         }
 
-        // Báo cho ListView cập nhật giao diện
         adapter.notifyDataSetChanged();
     }
 
-    // Hàm bung Pop-up Cảnh báo
     private void hienCanhBaoVuotChi() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("⚠️ CẢNH BÁO");
