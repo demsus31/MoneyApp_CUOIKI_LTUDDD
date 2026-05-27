@@ -36,30 +36,23 @@ public class MainActivity extends AppCompatActivity {
 
         // --- NÚT ĐĂNG KÝ ---
         btnRegister.setOnClickListener(v -> {
-            String user = edtUsername.getText().toString();
-            String pass = edtPassword.getText().toString();
-
-            if (user.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(MainActivity.this, "Vui lòng nhập đủ thông tin!", Toast.LENGTH_SHORT).show();
-            } else {
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
-                ContentValues values = new ContentValues();
-                values.put("username", user);
-                values.put("password", pass);
-
-                long result = db.insert("users", null, values);
-                if (result == -1) {
-                    Toast.makeText(MainActivity.this, "Tài khoản đã tồn tại!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "Đăng ký thành công! Hãy bấm Đăng Nhập.", Toast.LENGTH_SHORT).show();
-                }
-            }
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
+        btnRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
 
         // --- NÚT ĐĂNG NHẬP ---
         btnLogin.setOnClickListener(v -> {
             String user = edtUsername.getText().toString();
             String pass = edtPassword.getText().toString();
+
+            if (user.isEmpty() || pass.isEmpty()) {
+                Toast.makeText(MainActivity.this, "Vui lòng nhập đầy đủ thông tin đăng nhập!", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             SQLiteDatabase db = dbHelper.getReadableDatabase();
             Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=? AND password=?", new String[]{user, pass});
@@ -83,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         tvForgotPassword.setOnClickListener(v -> {
             String user = edtUsername.getText().toString();
 
-            // Ép người dùng phải gõ cái tên tài khoản vào ô Username trước
             if (user.isEmpty()) {
                 Toast.makeText(MainActivity.this, "Vui lòng nhập Tên đăng nhập vào ô phía trên để khôi phục!", Toast.LENGTH_LONG).show();
                 return;
@@ -91,25 +83,21 @@ public class MainActivity extends AppCompatActivity {
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-            // Kiểm tra xem tên đăng nhập này có tồn tại trong hệ thống không
+
             Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=?", new String[]{user});
             if (cursor.getCount() > 0) {
-                // Tạo mật khẩu khôi phục theo công thức em yêu cầu
                 String newPassword = user + "_khoiphuc";
 
-                // Cập nhật mật khẩu mới vào Database (dùng hàm UPDATE)
                 ContentValues values = new ContentValues();
                 values.put("password", newPassword);
                 db.update("users", values, "username=?", new String[]{user});
 
-                // Hiện cái bảng thông báo cho người dùng thấy
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle("Khôi phục thành công");
                 builder.setMessage("Mật khẩu mới của bạn là:\n\n" + newPassword + "\n\nHãy dùng mật khẩu này để đăng nhập và đổi lại mật khẩu mới nhé!");
                 builder.setPositiveButton("Đã hiểu", null);
                 builder.show();
 
-                // Tự động điền luôn mật khẩu mới vào ô cho tiện
                 edtPassword.setText(newPassword);
             } else {
                 Toast.makeText(MainActivity.this, "Tài khoản không tồn tại!", Toast.LENGTH_SHORT).show();
