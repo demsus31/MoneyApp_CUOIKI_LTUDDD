@@ -39,10 +39,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
-        btnRegister.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-            startActivity(intent);
-        });
 
         // --- NÚT ĐĂNG NHẬP ---
         btnLogin.setOnClickListener(v -> {

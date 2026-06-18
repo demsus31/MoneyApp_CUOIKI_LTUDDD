@@ -92,7 +92,7 @@ public class ReportActivity extends AppCompatActivity {
         tvBCThu.setText("Tổng thu: " + formatter.format(tongThu).replace(",", ".") + " đ");
         tvBCChi.setText("Tổng chi: " + formatter.format(tongChi).replace(",", ".") + " đ");
 
-        // --- ẢO THUẬT VẼ BIỂU ĐỒ ---
+        // --- VẼ BIỂU ĐỒ ---
         double maxTien = Math.max(tongThu, tongChi);
         if (maxTien == 0) maxTien = 1;
 

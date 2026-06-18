@@ -17,12 +17,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Hàm onCreate chỉ chạy 1 lần duy nhất khi App được cài đặt lần đầu
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // 1. Tạo bảng USERS để lưu thông tin tài khoản đăng nhập
+        // Tạo bảng USERS để lưu thông tin tài khoản đăng nhập
         String createTableUsers = "CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT)";
         db.execSQL(createTableUsers);
 
-        // 2. Tạo bảng TRANSACTIONS để lưu lịch sử thu chi
-        // LƯU Ý: Có thêm cột 'username' để phân biệt giao dịch này là của ai nhập
+        //Tạo bảng TRANSACTIONS để lưu lịch sử thu chi
         String createTableTransactions = "CREATE TABLE transactions(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, type INTEGER, amount REAL, date TEXT, note TEXT)";
         db.execSQL(createTableTransactions);
     }

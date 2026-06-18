@@ -52,7 +52,6 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Ánh xạ giao diện
         btnThemGiaoDich = findViewById(R.id.btnThemGiaoDich);
         btnLocTatCa = findViewById(R.id.btnLocTatCa);
         btnLocThu = findViewById(R.id.btnLocThu);
@@ -60,7 +59,7 @@ public class HomeActivity extends AppCompatActivity {
         btnTimKiemNgay = findViewById(R.id.btnTimKiemNgay);
         btnTimKiemKhoangNgay = findViewById(R.id.btnTimKiemKhoangNgay);
         btnProfile = findViewById(R.id.btnProfile);
-        btnBaoCao = findViewById(R.id.btnBaoCao); // Nút Báo cáo mới thêm
+        btnBaoCao = findViewById(R.id.btnBaoCao);
 
         tvTongThu = findViewById(R.id.tvTongThu);
         tvTongChi = findViewById(R.id.tvTongChi);
@@ -72,7 +71,15 @@ public class HomeActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, danhSachGiaoDich);
         lvLichSu.setAdapter(adapter);
 
-        // --- CÁC SỰ KIỆN CHUYỂN TRANG ---
+        SharedPreferences sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String currentUser = sharedPref.getString("current_user", "Admin");
+        if (currentUser != null && !currentUser.isEmpty()) {
+            // Cắt chữ cái đầu tiên và viết hoa lên
+            String initial = currentUser.substring(0, 1).toUpperCase();
+            btnProfile.setText(initial);
+        }
+
+        // chuyển trang
         btnProfile.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
             startActivity(intent);
@@ -88,8 +95,9 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // --- CÁC SỰ KIỆN NÚT BẤM BỘ LỌC ---
+        // các nút lọc
         btnLocTatCa.setOnClickListener(v -> { cheDoLocLoai = 0; cheDoLocThoiGian = 0; capNhatThongKe(); });
+        btnLocTatCa.setTextColor(Color.parseColor("#FFFFFF"));
         btnLocThu.setOnClickListener(v -> { cheDoLocLoai = 1; capNhatThongKe(); });
         btnLocChi.setOnClickListener(v -> { cheDoLocLoai = 2; capNhatThongKe(); });
 
@@ -100,11 +108,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        daCanhBao = false; // Reset cảnh báo mỗi khi quay lại trang chủ
+        daCanhBao = false; // reset cảnh báo khi quay lại trang chủ
         capNhatThongKe();
     }
 
-    // --- CÔNG CỤ: TỰ ĐỘNG THÊM DẤU GẠCH CHÉO ---
+    // gạch chéo cho ngày/tháng/năm
     private void ganHieuUngGachCheo(EditText edt) {
         edt.addTextChangedListener(new TextWatcher() {
             boolean isUpdating = false;
@@ -130,10 +138,10 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    // --- CHẾ ĐỘ 1: BẢNG TÌM 1 NGÀY ---
+    // tìm kiếm 1 ngày cụ thể
     private void hienBangTimKiemNgay() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🔍 Tìm 1 ngày cụ thể");
+        builder.setTitle("📅 Chọn ngày");
 
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.HORIZONTAL);
@@ -175,10 +183,10 @@ public class HomeActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // --- CHẾ ĐỘ 2: BẢNG TÌM KHOẢNG NGÀY ---
+    // tìm khoảng ngày
     private void hienBangTimKiemKhoangNgay() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("🗓 Tìm kiếm khoảng ngày");
+        builder.setTitle("🗓 Tùy chỉnh khoảng ngày");
 
         LinearLayout layoutTong = new LinearLayout(this);
         layoutTong.setOrientation(LinearLayout.VERTICAL);
@@ -259,14 +267,14 @@ public class HomeActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // --- XỬ LÝ LÕI: QUÉT DỮ LIỆU & CẬP NHẬT GIAO DIỆN ---
+    // quét dữ liệu + cập nhật giao diện
     @SuppressLint("Range")
     private void capNhatThongKe() {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         SharedPreferences sharedPref = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         String currentUser = sharedPref.getString("current_user", "");
 
-        // Lấy toàn bộ dữ liệu của User này ra, việc kiểm tra ngày để Java lo
+        // lấy dữ liệu của user
         String query = "SELECT * FROM transactions WHERE username = '" + currentUser + "' ORDER BY id DESC";
 
         Cursor cursor = db.rawQuery(query, null);
@@ -284,7 +292,7 @@ public class HomeActivity extends AppCompatActivity {
 
                 boolean thoaManThoiGian = true;
 
-                // Kiểm tra xem hóa đơn này có khớp với bộ lọc ngày không
+                // kiểm tra xem hóa đơn này có khớp với bộ lọc ngày không
                 if (cheDoLocThoiGian == 1) { // Chọn 1 ngày
                     if (!date.equals(ngayTimKiem)) thoaManThoiGian = false;
                 } else if (cheDoLocThoiGian == 2) { // Chọn khoảng ngày
@@ -300,7 +308,19 @@ public class HomeActivity extends AppCompatActivity {
 
                     if (cheDoLocLoai == 0 || cheDoLocLoai == type) {
                         String formattedAmount = formatter.format(amount).replace(",", ".");
-                        danhSachGiaoDich.add(((type == 1) ? "[THU] " : "[CHI] ") + note + ": " + formattedAmount + " đ (" + date + ")");
+
+                        // Xử lý chuỗi ghi chú (Viết hoa chữ cái đầu)
+                        String ghiChu = note;
+                        if (note != null && !note.isEmpty()) {
+                            ghiChu = note.substring(0, 1).toUpperCase() + note.substring(1).toLowerCase();
+                        }
+
+                        // Định dạng Icon và dấu tiền tệ
+                        String icon = (type == 1) ? "📈" : "📉";
+                        String dau = (type == 1) ? "+" : "-";
+
+                        // Ghép chuỗi hiển thị lên ListView
+                        danhSachGiaoDich.add(icon + " " + ghiChu + ": " + dau + " " + formattedAmount + " đ   (" + date + ")");
                     }
                 }
             } while (cursor.moveToNext());
@@ -309,8 +329,8 @@ public class HomeActivity extends AppCompatActivity {
 
         double soDu = tongThu - tongChi;
 
-        // Cập nhật Nhãn thời gian
-        String labelThoiGian = "MỌI LÚC";
+        // Cập nhật Nhãn thời gian (Tinh chỉnh lại câu chữ)
+        String labelThoiGian = "Hiện tại";
         if (cheDoLocThoiGian == 1) {
             labelThoiGian = ngayTimKiem;
         } else if (cheDoLocThoiGian == 2 && ngayBatDau != null && ngayKetThuc != null) {
@@ -318,9 +338,14 @@ public class HomeActivity extends AppCompatActivity {
                     new SimpleDateFormat("dd/MM", Locale.getDefault()).format(ngayKetThuc);
         }
 
-        tvTongThu.setText("Tổng thu:\n" + formatter.format(tongThu).replace(",", ".") + " đ");
-        tvTongChi.setText("Tổng chi:\n" + formatter.format(tongChi).replace(",", ".") + " đ");
-        tvSoDu.setText("SỐ DƯ (" + labelThoiGian + "): " + formatter.format(soDu).replace(",", ".") + " đ");
+        // Cập nhật UI với mã màu chuẩn Material Design
+        tvTongThu.setText("📈 Tổng thu:\n" + formatter.format(tongThu).replace(",", ".") + " đ");
+        tvTongThu.setTextColor(Color.parseColor("#10B981")); // Màu Xanh Ngọc (Emerald)
+
+        tvTongChi.setText("📉 Tổng chi:\n" + formatter.format(tongChi).replace(",", ".") + " đ");
+        tvTongChi.setTextColor(Color.parseColor("#EF4444")); // Màu Đỏ San Hô (Coral)
+
+        tvSoDu.setText("Số dư (" + labelThoiGian + "): " + formatter.format(soDu).replace(",", ".") + " đ");
 
         // Ẩn hiện các mục dựa vào việc người dùng đang lọc Thu hay lọc Chi
         if (cheDoLocLoai == 1) {
@@ -339,10 +364,12 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         tvSoDu.setVisibility(View.VISIBLE);
+
+        // Đổi màu Số dư dựa trên tình trạng âm/dương
         if (soDu < 0) {
-            tvSoDu.setTextColor(Color.RED);
+            tvSoDu.setTextColor(Color.parseColor("#EF4444")); // Âm: Màu Đỏ
         } else {
-            tvSoDu.setTextColor(Color.parseColor("#1565C0"));
+            tvSoDu.setTextColor(Color.parseColor("#1565C0")); // Dương: Màu Xanh Dương An Toàn
         }
 
         adapter.notifyDataSetChanged();

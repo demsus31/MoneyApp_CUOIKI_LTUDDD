@@ -1,143 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="15dp"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:background="#F0F2F5"> <androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="20dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="6dp"
+    app:cardUseCompatPadding="true">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp">
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tổng Quan Tài Chính"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#212121"
+                android:layout_centerInParent="true"/>
+
+            <Button
+                android:id="@+id/btnProfile"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:text="A"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/button_blue_filled_rounded"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:padding="0dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="15dp">
+
+            <TextView
+                android:id="@+id/tvTongThu"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="📈 Tổng thu:\n0 đ"
+                android:textSize="16sp"
+                android:textColor="#10B981"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/tvTongChi"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="📉 Tổng chi:\n0 đ"
+                android:textSize="16sp"
+                android:textColor="#EF4444"
+                android:textStyle="bold"
+                android:gravity="center"/>
+        </LinearLayout>
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/tvSoDu"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TỔNG QUAN TÀI CHÍNH"
-            android:textSize="22sp"
+            android:text="Số dư hiện tại: 0 đ"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_centerInParent="true"/>
+            android:textColor="#1565C0"
+            android:gravity="center"
+            android:background="@drawable/background_light_blue_rounded"
+            android:padding="10dp"
+            android:layout_marginBottom="10dp"/>
 
-        <Button
-            android:id="@+id/btnProfile"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:text="👤"
-            android:textSize="20sp"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:padding="0dp"
-            android:minWidth="0dp"
-            android:minHeight="0dp"/>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="15dp">
-
-        <TextView
-            android:id="@+id/tvTongThu"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tổng thu:\n0 đ"
-            android:textSize="16sp"
-            android:textColor="#2E7D32"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="5dp">
 
-        <TextView
-            android:id="@+id/tvTongChi"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            <Button
+                android:id="@+id/btnLocTatCa"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="Tất cả"
+                android:textSize="12sp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/button_border_dark"
+                android:textColor="#424242"
+                android:minWidth="0dp" />
+
+            <Button
+                android:id="@+id/btnLocThu"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="Khoản thu"
+                android:textSize="12sp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/button_border_green"
+                android:textColor="#10B981"
+                android:minWidth="0dp" />
+
+            <Button
+                android:id="@+id/btnLocChi"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="Khoản chi"
+                android:textSize="12sp"
+                android:background="@drawable/button_border_red"
+                android:textColor="#EF4444"
+                android:minWidth="0dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tổng chi:\n0 đ"
-            android:textSize="16sp"
-            android:textColor="#C62828"
-            android:textStyle="bold"
-            android:gravity="center"/>
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnTimKiemNgay"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="📅 Chọn ngày"
+                android:textSize="12sp"
+                android:layout_marginEnd="5dp"
+                android:textColor="#1565C0"
+                android:minWidth="0dp" />
+
+            <Button
+                android:id="@+id/btnTimKiemKhoangNgay"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="🗓 Tùy chỉnh"
+                android:textSize="12sp"
+                android:textColor="#F57C00"
+                android:minWidth="0dp" />
+        </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvSoDu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="SỐ DƯ HIỆN TẠI: 0 đ"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#1565C0"
-        android:layout_marginBottom="15dp"/>
+</androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="0dp">
-
-        <Button
-            android:id="@+id/btnLocTatCa"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tất cả"
-            android:textSize="12sp"
-            android:textColor="#000000" />
-
-        <Button
-            android:id="@+id/btnLocThu"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chỉ Thu"
-            android:textSize="12sp"
-            android:textColor="#2E7D32" />
-
-        <Button
-            android:id="@+id/btnLocChi"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Chỉ Chi"
-            android:textSize="12sp"
-            android:textColor="#C62828" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginBottom="0dp">
-
-        <Button
-            android:id="@+id/btnTimKiemNgay"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔍 Ngày cụ thể"
-            android:textSize="13sp"
-            android:textColor="#1565C0" />
-
-        <Button
-            android:id="@+id/btnTimKiemKhoangNgay"
-            style="?android:attr/borderlessButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🗓 Khoảng ngày"
-            android:textSize="13sp"
-            android:textColor="#F57C00" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
+        android:gravity="end"
         android:layout_marginBottom="10dp">
 
         <Button
@@ -145,23 +174,37 @@
             style="?android:attr/borderlessButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="📊 BÁO CÁO THU CHI"
+            android:text="📊 Xem báo cáo phân tích"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:textColor="#388E3C" />
+            android:textColor="#1565C0" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lvLichSu"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginBottom="15dp" />
+        android:layout_marginBottom="15dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp">
+
+        <ListView
+            android:id="@+id/lvLichSu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:divider="#F0F0F0"
+            android:dividerHeight="1dp"/>
+    </androidx.cardview.widget.CardView>
 
     <Button
         android:id="@+id/btnThemGiaoDich"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:text="+ THÊM KHOẢN THU / CHI"
-        android:textSize="16sp"/>
+        android:text="+ Thêm giao dịch mới"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/button_blue_filled_rounded"
+        android:layout_marginTop="5dp"/>
 </LinearLayout>
